@@ -1,4 +1,5 @@
 package edu.tcu.cs.hogwartsartifactsonline.wizard;
+import edu.tcu.cs.hogwartsartifactsonline.artifact.Artifact;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import edu.tcu.cs.hogwartsartifactsonline.artifact.ArtifactRepository;
@@ -52,5 +53,23 @@ public class WizardService {
         this.wizardRepository.deleteById(wizardId);
     }
 
+    public void assignArtifact(Integer wizardId, String artifactId) {
+        // Find artifact by Id from DB
+        Artifact artifactToBeAssigned = this.artifactRepository
+                .findById(artifactId)
+                .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
+
+        // Find wizard by Id from DB
+        Wizard wizard = this.wizardRepository
+                .findById(wizardId)
+                .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
+
+        // Artifact assignment
+        // Need to see if artifact is already owned by some wizard
+        if(artifactToBeAssigned.getOwner() != null) {
+            artifactToBeAssigned.getOwner().removeArtifact(artifactToBeAssigned);
+        }
+        wizard.addArtifact(artifactToBeAssigned);
+    }
 
 }
